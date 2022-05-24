@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dates track</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+        integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
+        integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <div id="root"></div>
+
+    <script type="module">
+
+        function todayStr() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            let mm = today.getMonth() + 1; // Months start at 0!
+            let dd = today.getDate();
+
+            if (dd < 10) dd = '0' + dd;
+            if (mm < 10) mm = '0' + mm;
+
+            return dd + '/' + mm + '/' + yyyy;
+        }
+
+
+        import { React, ReactDOM } from 'https://unpkg.com/es-react';
+        import nojsx from 'https://giabos.github.io/nojsx/index.js';
+        const { h1, div, p, span, button, ul, li, component } = nojsx(React.createElement);
+        const { useState, useEffect } = React;
+
+
+        const useLocalStorage = (keyName, defaultValue) => {
+            const [storedValue, setStoredValue] = React.useState(() => {
+                try {
+                    const value = window.localStorage.getItem(keyName);
+
+                    if (value) {
+                        return JSON.parse(value);
+                    } else {
+                        window.localStorage.setItem(keyName, JSON.stringify(defaultValue));
+                        return defaultValue;
+                    }
+                } catch (err) {
+                    return defaultValue;
+                }
+            });
+
+            const setValue = newValue => {
+                try {
+                    window.localStorage.setItem(keyName, JSON.stringify(newValue));
+                } catch (err) { }
+                setStoredValue(newValue);
+            };
+
+            return [storedValue, setValue];
+        };
+
+
+        const App = component(({ }) => {
+            const [list, setList] = useLocalStorage("dates", []);
+            return [
+                h1("Dates"),
+                button({ onClick: () => setList([]), className: 'ui red basic button' }, `Clear all (${list.length })`),
+                ul(list.map(a => li(a))),
+                button({ onClick: () => setList(([...list, todayStr()])), className: 'ui primary button' }, "Add"),
+            ];
+        });
+        ReactDOM.render(App(), document.getElementById('root'));
+
+    </script>
+
+</body>
+
+</html>
